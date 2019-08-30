@@ -74,6 +74,18 @@ public:
    */
   virtual std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String& authorizationHeader) = 0;
 
+  /**
+   * Implement this method! Should generate e.g. 'Basic realm="API"' for basic authentication
+   * @return
+   */
+  virtual oatpp::String generateAuthorizationRequest(const oatpp::String& realm, const oatpp::String& param) = 0;
+
+  /**
+   * Implement this method! Should generate e.g. 'Basic' for basic authentication
+   * @return
+   */
+  virtual oatpp::String generateAuthorizationInfo(const oatpp::String& realm, const oatpp::String& param) = 0;
+
 };
 
 /**
@@ -89,7 +101,7 @@ public:
    * @param header - &id:oatpp::String;.
    * @return - std::shared_ptr to &id:oatpp::web::server::handler::AuthorizationObject;.
    */
-  std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String &header) override;
+  std::shared_ptr<AuthorizationObject> handleAuthorization(const oatpp::String& header) override;
 
   /**
    * Implement this method! Do the actual authorization here. When not implemented returns &l:DefaultAuthorizationObject
@@ -98,6 +110,18 @@ public:
    * @return - `std::shared_ptr` to &l:AuthorizationObject;.
    */
   virtual std::shared_ptr<AuthorizationObject> authorize(const oatpp::String& userId, const oatpp::String& password);
+
+  /**
+   * Implement this method! Should generate e.g. 'Basic realm="API"' for basic authentication
+   * @return
+   */
+  virtual oatpp::String generateAuthorizationRequest(const oatpp::String& realm, const oatpp::String& param);
+
+  /**
+   * Implement this method! Should generate e.g. 'Basic' for basic authentication
+   * @return
+   */
+  virtual oatpp::String generateAuthorizationInfo(const oatpp::String& realm, const oatpp::String& param);
 
 };
 

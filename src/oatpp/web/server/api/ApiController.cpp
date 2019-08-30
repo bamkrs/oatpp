@@ -28,7 +28,7 @@
 namespace oatpp { namespace web { namespace server { namespace api {
   
 void ApiController::addEndpointsToRouter(const std::shared_ptr<Router>& router){
-  auto node = m_endpoints->getFirstNode();
+  auto node = getEndpoints()->getFirstNode();
   while (node != nullptr) {
     auto endpoint = node->getData();
     router->route(endpoint->info->method, endpoint->info->path, endpoint->handler);
@@ -37,6 +37,9 @@ void ApiController::addEndpointsToRouter(const std::shared_ptr<Router>& router){
 }
 
 std::shared_ptr<ApiController::Endpoints> ApiController::getEndpoints() {
+  if(!m_endpoints){
+    m_endpoints = Endpoints::createShared();
+  }
   return m_endpoints;
 }
 
@@ -60,6 +63,22 @@ std::shared_ptr<ApiController::OutgoingResponse> ApiController::handleError(cons
 std::shared_ptr<handler::AuthorizationObject> ApiController::handleAuthorization(const String &authHeader) const {
   if(m_authorizationHandler) {
     return m_authorizationHandler->handleAuthorization(authHeader);
+  }
+  // If Authorization is not setup on the server then it's 500
+  throw oatpp::web::protocol::http::HttpError(Status::CODE_500, "Authorization is not setup.");
+}
+
+oatpp::String ApiController::generateAuthorizationRequest(const String &realm, const String &param) const {
+  if(m_authorizationHandler) {
+    return m_authorizationHandler->generateAuthorizationRequest(realm, param);
+  }
+  // If Authorization is not setup on the server then it's 500
+  throw oatpp::web::protocol::http::HttpError(Status::CODE_500, "Authorization is not setup.");
+}
+
+oatpp::String ApiController::generateAuthorizationInfo(const oatpp::String &realm, const oatpp::String &param) const {
+  if(m_authorizationHandler) {
+    return m_authorizationHandler->generateAuthorizationInfo(realm, param);
   }
   // If Authorization is not setup on the server then it's 500
   throw oatpp::web::protocol::http::HttpError(Status::CODE_500, "Authorization is not setup.");

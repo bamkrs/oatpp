@@ -77,6 +77,7 @@ class DefaultBasicAuthorizationController : public oatpp::web::server::api::ApiC
   DefaultBasicAuthorizationController(const std::shared_ptr<ObjectMapper>& objectMapper)
       : oatpp::web::server::api::ApiController(objectMapper)
   {
+    m_authorizationHandler = std::make_shared<oatpp::web::server::handler::BasicAuthorizationHandler>();
   }
  public:
 

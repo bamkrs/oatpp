@@ -258,13 +258,13 @@ info->body.type = TYPE::Class::getType();
 auto __param_str_val_##NAME = __request->getHeader(oatpp::web::protocol::http::Header::AUTHORIZATION); \
 if(!__param_str_val_##NAME){ \
   auto error = ApiController::handleError(Status::CODE_401, "Missing HEADER parameter 'Authorization'"); \
-  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, "Basic realm=\"API\""); \
+  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, ApiController::generateAuthorizationRequest()); \
   return error; \
 } \
 std::shared_ptr<oatpp::web::server::handler::AuthorizationObject> __param_aosp_val_##NAME = ApiController::handleAuthorization(__param_str_val_##NAME); \
 if(__param_aosp_val_##NAME.get() == nullptr) { \
   auto error = ApiController::handleError(Status::CODE_401, "Unauthorized"); \
-  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, "Basic realm=\"API\""); \
+  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, ApiController::generateAuthorizationRequest()); \
   return error; \
 } \
 TYPE NAME = std::static_pointer_cast<TYPE::element_type>(__param_aosp_val_##NAME); \
@@ -277,13 +277,13 @@ if(NAME.get() == nullptr) { \
 auto __param_str_val_##NAME = __request->getHeader(oatpp::web::protocol::http::Header::AUTHORIZATION); \
 if(!__param_str_val_##NAME){ \
   auto error = ApiController::handleError(Status::CODE_401, "Missing HEADER parameter 'Authorization'"); \
-  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, "Basic realm=\"" REALM "\""); \
+  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, ApiController::generateAuthorizationRequest(REALM)); \
   return error; \
 } \
 std::shared_ptr<oatpp::web::server::handler::AuthorizationObject> __param_aosp_val_##NAME = ApiController::handleAuthorization(__param_str_val_##NAME); \
 if(__param_aosp_val_##NAME.get() == nullptr) { \
   auto error = ApiController::handleError(Status::CODE_401, "Unauthorized"); \
-  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, "Basic realm=\"" REALM "\""); \
+  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, ApiController::generateAuthorizationRequest(REALM)); \
   return error; \
 } \
 TYPE NAME = std::static_pointer_cast<TYPE::element_type>(__param_aosp_val_##NAME); \
@@ -291,17 +291,17 @@ if(NAME.get() == nullptr) { \
   return ApiController::handleError(Status::CODE_500, "Unable to cast authorization result to '" #TYPE "'"); \
 }
 
-#define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_3(TYPE, NAME, REALM, SCHEME) \
+#define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_3(TYPE, NAME, REALM, PARAM) \
 auto __param_str_val_##NAME = __request->getHeader(oatpp::web::protocol::http::Header::AUTHORIZATION); \
 if(!__param_str_val_##NAME){ \
   auto error = ApiController::handleError(Status::CODE_401, "Missing HEADER parameter 'Authorization'"); \
-  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, SCHEME " realm=\"" REALM "\""); \
+  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, ApiController::generateAuthorizationRequest(REALM, PARAM)); \
   return error; \
 } \
 std::shared_ptr<oatpp::web::server::handler::AuthorizationObject> __param_aosp_val_##NAME = ApiController::handleAuthorization(__param_str_val_##NAME); \
 if(__param_aosp_val_##NAME.get() == nullptr) { \
   auto error = ApiController::handleError(Status::CODE_401, "Unauthorized"); \
-  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, SCHEME " realm=\"" REALM "\""); \
+  error->putHeader(oatpp::web::protocol::http::Header::WWW_AUTHENTICATE, ApiController::generateAuthorizationRequest(REALM, PARAM)); \
   return error; \
 } \
 TYPE NAME = std::static_pointer_cast<TYPE::element_type>(__param_aosp_val_##NAME); \
@@ -316,18 +316,18 @@ OATPP_MACRO_API_CONTROLLER_MACRO_SELECTOR(OATPP_MACRO_API_CONTROLLER_AUTHORIZATI
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_1(TYPE, NAME) \
 info->headers.add(oatpp::web::protocol::http::Header::AUTHORIZATION, oatpp::String::Class::getType()); \
-info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = "Basic"; \
-info->authorization = "Basic";
+info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = #NAME; \
+info->authorization = #TYPE;
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_2(TYPE, NAME, REALM) \
 info->headers.add(oatpp::web::protocol::http::Header::AUTHORIZATION, oatpp::String::Class::getType()); \
-info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = "Basic"; \
-info->authorization = "Basic";
+info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = #NAME " ( " REALM " )"; \
+info->authorization = #TYPE;
 
-#define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_3(TYPE, NAME, REALM, SCHEME) \
+#define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_3(TYPE, NAME, REALM, PARAM) \
 info->headers.add(oatpp::web::protocol::http::Header::AUTHORIZATION, oatpp::String::Class::getType()); \
-info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = SCHEME; \
-info->authorization = SCHEME;
+info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = #NAME " ( " REALM " , " PARAM " )"; \
+info->authorization = #TYPE;
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO(TYPE, PARAM_LIST) \
 OATPP_MACRO_API_CONTROLLER_MACRO_SELECTOR(OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_, TYPE, OATPP_MACRO_UNFOLD_VA_ARGS PARAM_LIST)
@@ -395,7 +395,7 @@ std::shared_ptr<Endpoint::Info> Z__CREATE_ENDPOINT_INFO_##NAME() { \
   return info; \
 } \
 \
-const std::shared_ptr<Endpoint> Z__ENDPOINT_##NAME = createEndpoint(m_endpoints, \
+const std::shared_ptr<Endpoint> Z__ENDPOINT_##NAME = createEndpoint(getEndpoints(), \
                                                         this, \
                                                         Z__ENDPOINT_METHOD_##NAME(this), \
                                                         nullptr, \
@@ -427,7 +427,7 @@ std::shared_ptr<Endpoint::Info> Z__CREATE_ENDPOINT_INFO_##NAME() { \
   return info; \
 } \
 \
-const std::shared_ptr<Endpoint> Z__ENDPOINT_##NAME = createEndpoint(m_endpoints, \
+const std::shared_ptr<Endpoint> Z__ENDPOINT_##NAME = createEndpoint(getEndpoints(), \
                                                         this, \
                                                         Z__ENDPOINT_METHOD_##NAME(this), \
                                                         nullptr, \
@@ -512,7 +512,7 @@ std::shared_ptr<Endpoint::Info> Z__CREATE_ENDPOINT_INFO_##NAME() { \
   return info; \
 } \
 \
-const std::shared_ptr<Endpoint> Z__ENDPOINT_##NAME = createEndpoint(m_endpoints, \
+const std::shared_ptr<Endpoint> Z__ENDPOINT_##NAME = createEndpoint(getEndpoints(), \
                                                                     this, \
                                                                     nullptr, \
                                                                     Z__ENDPOINT_METHOD_##NAME(this), \

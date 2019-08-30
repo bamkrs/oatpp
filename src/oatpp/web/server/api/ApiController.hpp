@@ -216,8 +216,9 @@ protected:
   std::unordered_map<std::string, std::shared_ptr<Endpoint::Info>> m_endpointInfo;
 public:
   ApiController(const std::shared_ptr<oatpp::data::mapping::ObjectMapper>& defaultObjectMapper)
-    : m_endpoints(Endpoints::createShared())
+    : m_endpoints(nullptr)
     , m_errorHandler(nullptr)
+    , m_authorizationHandler(nullptr)
     , m_defaultObjectMapper(defaultObjectMapper)
   {}
 public:
@@ -269,7 +270,23 @@ public:
    * Currently returns AuthorizationObject created by AuthorizationHandler or return DefaultAuthrorizationObject by DefaultAuthorizationHandler if AuthorizationHandler is null
    */
   std::shared_ptr<handler::AuthorizationObject> handleAuthorization(const String &authHeader) const;
-  
+
+  /**
+   * [under discussion]
+   * Do not use it directly. This method is under discussion.
+   * Should return an authorization request like 'Basic realm="API"'
+   * @return
+   */
+  oatpp::String generateAuthorizationRequest(const String &realm = nullptr, const String &param = nullptr) const;
+
+  /**
+   * [under discussion]
+   * Do not use it directly. This method is under discussion.
+   * Should return an authorization request like 'Basic'
+   * @return
+   */
+  oatpp::String generateAuthorizationInfo(const String &realm = nullptr, const String &param = nullptr) const;
+
   /**
    * [under discussion]
    * Set error handler to handle calls to handleError

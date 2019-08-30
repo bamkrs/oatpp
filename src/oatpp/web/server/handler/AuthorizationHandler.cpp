@@ -58,4 +58,20 @@ std::shared_ptr<AuthorizationObject> BasicAuthorizationHandler::authorize(const 
   return authorizationObject;
 }
 
+oatpp::String BasicAuthorizationHandler::generateAuthorizationRequest(const oatpp::String &realm, const oatpp::String &param) {
+  (void) param;
+
+  if (realm) {
+    return "Basic realm=\"" + realm + "\"";
+  }
+
+  return "Basic realm=\"API\"";
+}
+
+oatpp::String BasicAuthorizationHandler::generateAuthorizationInfo(const oatpp::String &realm, const oatpp::String &param) {
+  (void)realm; (void)param;
+
+  return "Basic";
+}
+
 }}}}

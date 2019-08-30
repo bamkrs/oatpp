@@ -73,6 +73,19 @@ public:
     return nullptr;
   }
 
+  String generateAuthorizationRequest(const String &realm, const String &param) override {
+    (void)param;
+    if(realm) {
+      return "Bearer realm=\"" + realm + "\"";
+    }
+    return "Bearer realm=\"API\"";
+  }
+
+  String generateAuthorizationInfo(const String &realm, const String &param) override {
+    (void)realm; (void)param;
+    return "Bearer";
+  }
+
 };
 
 class BearerAuthorizationController : public oatpp::web::server::api::ApiController {
