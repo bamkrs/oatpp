@@ -316,18 +316,18 @@ OATPP_MACRO_API_CONTROLLER_MACRO_SELECTOR(OATPP_MACRO_API_CONTROLLER_AUTHORIZATI
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_1(TYPE, NAME) \
 info->headers.add(oatpp::web::protocol::http::Header::AUTHORIZATION, oatpp::String::Class::getType()); \
-info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = #NAME; \
-info->authorization = #TYPE;
+info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = ApiController::generateAuthorizationInfo(); \
+info->authorization = ApiController::generateAuthorizationInfo();
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_2(TYPE, NAME, REALM) \
 info->headers.add(oatpp::web::protocol::http::Header::AUTHORIZATION, oatpp::String::Class::getType()); \
-info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = #NAME " ( " REALM " )"; \
-info->authorization = #TYPE;
+info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = ApiController::generateAuthorizationInfo(REALM); \
+info->authorization = ApiController::generateAuthorizationInfo(REALM);
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_3(TYPE, NAME, REALM, PARAM) \
 info->headers.add(oatpp::web::protocol::http::Header::AUTHORIZATION, oatpp::String::Class::getType()); \
-info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = #NAME " ( " REALM " , " PARAM " )"; \
-info->authorization = #TYPE;
+info->headers[oatpp::web::protocol::http::Header::AUTHORIZATION].description = ApiController::generateAuthorizationInfo(REALM, PARAM); \
+info->authorization = ApiController::generateAuthorizationInfo(REALM, PARAM);
 
 #define OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO(TYPE, PARAM_LIST) \
 OATPP_MACRO_API_CONTROLLER_MACRO_SELECTOR(OATPP_MACRO_API_CONTROLLER_AUTHORIZATION_INFO_, TYPE, OATPP_MACRO_UNFOLD_VA_ARGS PARAM_LIST)
